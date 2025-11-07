@@ -1,0 +1,38 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Копирование package.json
+COPY package.json package-lock.json* ./
+
+# Установка зависимостей
+RUN npm ci
+
+# Копирование остального кода
+COPY . .
+
+# Build аргументы
+ARG VITE_API_URL
+ARG VITE_WS_URL
+
+# Установка переменных окружения для build
+ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_WS_URL=${VITE_WS_URL}
+
+# Сборка приложения
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Копирование собранного приложения
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Копирование nginx конфигурации
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose порт
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]
+

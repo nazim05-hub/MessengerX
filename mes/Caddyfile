@@ -1,0 +1,17 @@
+localhost:3000 {
+    reverse_proxy frontend:3000
+}
+
+localhost:8000 {
+    reverse_proxy backend:8000
+}
+
+# Для продакшена раскомментируйте и настройте:
+# yourdomain.com {
+#     reverse_proxy frontend:3000
+# }
+# 
+# api.yourdomain.com {
+#     reverse_proxy backend:8000
+# }
+
